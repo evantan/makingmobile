@@ -1,0 +1,108 @@
+{
+    /* 应用的名称。应符合变量命名规则 */
+    "name": 'MyApp',
+    
+    /* 应用的版本号，应符合"Semantic Versioning"规则 */
+    "version": "0.1.0",
+    
+    /* 应用描述 */
+    "description": "我的应用",
+    
+    /* 应用入口，也就是调用"mm run"时加载的脚本 */
+    "main": "server/app.js",
+    /*
+     * 为true时，将环境变量NODE_ENV设置为“development”，将应用放在开发调试环境下运行；
+     * 为false时，将环境变量NODE_ENV设置为“production”，将应用放在生产环境下运行
+     */
+    "debug": true,
+    
+    "port": 80,
+    
+    "urlprefix": "",
+    
+    /*
+     *  静态目录，每项为 url: folder-path 结构
+     */
+    "static": {
+        "/static": "client/",
+        //"/repository": "build/repository/"
+    },
+    
+    /* forever设置 */
+    "forever": {
+        /* 是否启用 */
+        "enable": true,
+        
+        /* 是否屏蔽被监控进程的输出 */
+        "silent": false,
+        
+        /* pid文件的位置 */
+        "pidFile": "forever/app.pid",
+        
+        /* stdout文件位置 */
+        "outFile": "forever/out.log",
+        
+        /* stderr文件位置 */
+        "errFile": "forever/err.log",
+        
+        /* 运行的最大次数 */
+        "max": Number.MAX_VALUE,
+        
+        /* 是否启用监控。当指定目录下文件发生变动后，重新启动进程 */
+        "watch": true,
+        
+        /* 
+         * 监控的顶层目录。目录下以"."开头的文件都会忽略监控。同时，可以放置一个".foreverignore"
+         * 文件以指定忽略规则。其格式同.gitignore文件。
+         */
+        "watchDirectory": "server/"
+    },
+    
+    /* server侧事件网关设置。null值指使用默认值 */
+    "gateway": {
+        /* ajax超时值，毫秒 */
+        "ajax_timeout": null, //default to 1000 * 3
+        
+        /* 心跳测试间隔，毫秒 */
+        "heartbeat_interval": null, //default to 1000 * 10 + ajax_timeout
+        
+        /* 判定连接出错前的容错次数 */
+        "maxerr": null, //default to 3
+        
+        /* 网关的zoneID，可设置为有意义的值 */
+        "zoneID": "MakingMobile Node Backend",
+        
+        /* 允许接入的zoneid白名单 */
+        "whiteList": /^.*$/, //allow all
+        
+        /* 禁止接入的zoneid黑名单 */
+        "blackList": [] //deny nothing
+    },
+    
+    "client": {
+        "generate-to": ["client/mm.js"],
+        "debug": true,
+        "standalone": "mm", //or false to use require('mm') style
+        "addon-lib": {
+            "jquery": "client/lib/jquery-2.0.2.js"
+        },
+        "instance-config": {
+            "url": "http://127.0.0.1:80",
+            "autopen": true
+        }
+    },
+    
+    "plugins": [{
+        "name": "log",
+        "version": "*",
+        "urlspace": "/log",
+        "file": "var/log.txt",
+        "db": "mongodb://localhost:27017/myapp",
+        "collection": "log",
+        "client_buff_max": 100
+    }, ],
+    
+    "dependencies":{
+        "mongodb": "*"
+    }
+}
