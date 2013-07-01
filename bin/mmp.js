@@ -1,4 +1,4 @@
-//#!/usr/bin/env node
+#!/usr/bin/env node
 
 /*jslint sub:true, evil:true */
 var CFG_FILE_NAME = 'mmconfig.json',
