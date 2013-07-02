@@ -2,7 +2,7 @@
   "name": "makingmobile",
   "version": "0.0.2-beta.2",
   "description": "MakingMobile framework",
-  "main": "index.js",
+  "main": "lib/makingmobile.js",
   "bin": {
     "mm": "bin/mm.js",
     "mmp": "bin/mmp.js"
