@@ -1,10 +1,10 @@
 /*jslint sub:true, evil:true */
 var CFG_FILE_NAME = 'mmconfig.json',
-    rootdir = path.resolve(process.cwd(), '../..'),
-    fs = require('fs'),
     path = require('path'),
+    rootdir = __dirname,
+    fs = require('fs'),
     config_file = path.resolve(rootdir, CFG_FILE_NAME),
-    mm = require('../lib/makingmobile');
+    mm = require('makingmobile');
 
 function main(argv) {
     var port = Number(argv[1]),
@@ -24,7 +24,7 @@ function main(argv) {
     }
     config.port = port > 0 && port < 65532 ? port : config.port;
     mm._rootdir = rootdir;
-    mm._init(config, path.resolve(config_file, '..'));
+    mm._init(config, rootdir);
 }
 
 exports.main = main;

@@ -75,6 +75,7 @@
     };
     
     BidiLink.prototype.resume = function () {
+        var self = this;
         if (!this._suspended) {
             return;
         }

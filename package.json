@@ -1,6 +1,6 @@
 {
   "name": "makingmobile",
-  "version": "0.0.1",
+  "version": "0.0.2-beta.2",
   "description": "MakingMobile framework",
   "main": "index.js",
   "bin": {
@@ -32,6 +32,5 @@
   ],
   "author": "MakingMobile Development Team",
   "license": "GPLv3",
-  "readmeFilename": "README.md",
-  "gitHead": "05cfe13d87b1563da2bf66374b5ab5a2500c721f"
+  "readmeFilename": "README.md"
 }

@@ -18,7 +18,7 @@ function slash_url(url) {
  */
 function MakingMobile(config){
     this.config = config;
-    this.hasPhoneGap = document.location.protocol === 'file:';
+    this.hasPhoneGap = document.location.protocol === 'file:' && window.device;
 }
 
 MakingMobile.prototype._envReady = function (plugins) {
@@ -27,7 +27,7 @@ MakingMobile.prototype._envReady = function (plugins) {
     
     this.localstore = Localstore();
     zoneID = this.localstore.get('zoneID');
-    if (!zoneID && device && device.uuid) {
+    if (!zoneID && this.hasPhoneGap) {
         zoneID = device.uuid;
         this.localstore.set('zoneID', zoneID);
     }
@@ -41,7 +41,7 @@ MakingMobile.prototype._envReady = function (plugins) {
     }
     this.go('envReady', null, {to: '.'});
     if (this.config.autopen) {
-        surl = slash_url(config.url) + slash_url(config.urlprefix || '');
+        surl = (this.config.url[this.config.url.length -1] === '/' ? this.config.url.slice(0, this.config.url.length -1) : this.config.url) + slash_url(this.config.urlprefix || '');
         this.gateway.open(surl + SERVER_GATEWAY_URLSPACE);
         if (this.hasPhoneGap && navigator.connection.type === Connection.NONE) {
             this.gateway.pause();

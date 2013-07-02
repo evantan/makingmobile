@@ -4,11 +4,11 @@ var CFG_FILE_NAME = 'mmconfig.json',
     USAGES = ['Build plugins in config, generate client-side files and do other stuff. For details, see docs'],
     fs = require('fs'),
     path = require('path'),
-    browserify = require('browserify'),
-    TEMP_ENTRY_FILE = path.resolve(cwd, 'node_modules', '.make_entry_file_tmp.js'),
-    CLIENT_MAIN_PATH = 'support/cilent/main',
-    npm = require('npm'),
     cwd = process.cwd(),
+    browserify = require('browserify'),
+    TEMP_ENTRY_FILE = path.resolve(cwd, 'node_modules/', '.make_entry_file_tmp.js'),
+    CLIENT_MAIN_PATH = 'support/client/main',
+    npm = require('npm'),
     config, packagejson;
 
 function show_usage(){
@@ -71,7 +71,7 @@ function after_install() {
     
     console.log('Build plugins...');
     for(i = 0; i < config.plugins.length; i++) {
-        plugin_build = require(PLUGIN_PREFIX + config.plugins[i].name).build;
+        plugin_build = require(path.resolve(cwd, 'node_modules/' + PLUGIN_PREFIX + config.plugins[i].name)).build;
         if (typeof plugin_build === 'function') {
             nextFns.push(plugin_build);
         }
@@ -80,6 +80,7 @@ function after_install() {
         console.log('Done.');
         generate_client_files();
     });  
+    nextFns[0](config, cwd, next);
 }
 
 function make_entry_file() {
@@ -96,14 +97,14 @@ function make_entry_file() {
     for (i = 0; i < config.plugins.length; i++) {
         content += 'plugin_config = ' + JSON.stringify(config.plugins[i]);
         content += '\n';
-        content += 'plugins.push({p: require("./' + config.plugins[i].name + '/' + CLIENT_MAIN_PATH + '"), config: plugin_config});';
+        content += 'plugins.push({p: require("./' + PLUGIN_PREFIX + config.plugins[i].name + '/' + CLIENT_MAIN_PATH + '"), config: plugin_config});';
         content += '\n';
     }
     content += 'var mm = new MakingMobile(' + JSON.stringify(config.client['instance-config']) + ');';
     content += '\n';
     content += 'mm._init(plugins);';
     content += '\n';
-    content += 'module.exports = mm;';
+    content += config.client.standalone ? 'window.' + config.client.standalone + ' = mm;' : 'module.exports = mm;';
     fs.writeFileSync(TEMP_ENTRY_FILE, content, {encoding: 'utf8'});
 }
 
@@ -133,40 +134,41 @@ function generate_client_files() {
                 if (npf && fs.existsSync(path.resolve(cwd, npf))) {
                     noParse.push(path.resolve(cwd, npf));
                 } else {
-                    return console.error("Cannot find addon-lib " + config.plugins[i]['noparse-files'][j] + " needed by plugin " + config.plugins[i].name);
+                    return console.error("Cannot find addon-lib '" + config.plugins[i]['_noparse-files'][j] + "' needed by plugin " + config.plugins[i].name);
                 }
             }
         }
     }
     make_entry_file();
     b = browserify({
-        entries: TEMP_ENTRY_FILE,
+        entries: noParse.concat(TEMP_ENTRY_FILE),
         noParse: noParse
     });
     b.bundle({
-        debug: config.client.debug,
-        standalone: config.client.standalone
+        debug: config.client.debug
     }, function(err, src) {
         var i, post_build;
         
-        fs.unlinkSync(TEMP_ENTRY_FILE);
         if (err) {
             console.error('Fail to generate client files: ' + err);
+            if(fs.existsSync(TEMP_ENTRY_FILE)) fs.unlinkSync(TEMP_ENTRY_FILE);
         } else {
             for (i = 0; i < gps.length; i++) {
-                fs.writeFileSyn(path.resolve(cwd, gps[i]), src);
+                fs.writeFileSync(path.resolve(cwd, gps[i]), src);
             }
+            if(fs.existsSync(TEMP_ENTRY_FILE)) fs.unlinkSync(TEMP_ENTRY_FILE);
             console.log('Done.');
             console.log('Running post-build procedure...');
             for(i = 0; i < config.plugins.length; i++) {
-                post_build = require(PLUGIN_PREFIX + config.plugins[i].name).post_build;
+                post_build = require(path.resolve(cwd, 'node_modules/' + PLUGIN_PREFIX + config.plugins[i].name)).post_build;
                 if (typeof post_build === 'function') {
                     nextFns.push(post_build);
                 }
             }
             nextFns.push(function() {
                 console.log('Done.');
-            }); 
+            });
+            nextFns[0](config, cwd, next);
         }
     });
 }

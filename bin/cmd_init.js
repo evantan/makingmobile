@@ -5,6 +5,13 @@ var CFG_FILE_NAME = 'mmconfig.json',
     fs = require('fs'),
     path = require('path');
 
+function copy_runjs(targetPath) {
+    var runjs_path = path.resolve(__dirname, '..', 'support', 'run.js');
+    if (!fs.existsSync(path.resolve(targetPath, 'run.js'))) {
+        fs.createReadStream(runjs_path).pipe(fs.createWriteStream(path.resolve(targetPath, 'run.js')));
+    }
+}
+
 function make_mmconfig(targetPath) {
     var init_config_path = path.resolve(__dirname, '..', 'support', 'init_config.json');
     if (!fs.existsSync(path.resolve(targetPath, CFG_FILE_NAME))) {
@@ -51,6 +58,7 @@ exports.main = function cmd(params) {
     if (params[0] == '-h' || params[0] == '--help') {
         show_usage();
     } else {
+        copy_runjs(cwd);
         make_mmconfig(cwd);
         make_var(cwd);
         make_client(cwd);

@@ -10,7 +10,7 @@ var CFG_FILE_NAME = 'mmconfig.json',
     path = require('path'),
     forever = require('forever-monitor').Monitor,
     cwd = process.cwd(),
-    mm_run_file = require(path.resolve(cwd, './node_modules/makingmobile/bin/run.js')),
+    mm_run_file = path.resolve(cwd, 'node_modules/makingmobile/support/run.js'),
     config, cp;
 
 function show_usage(){
@@ -22,7 +22,8 @@ function show_usage(){
 
 exports.main = function cmd(params) {
     var options = [path.resolve(cwd, CFG_FILE_NAME)],
-        p;
+        p, pidFile, outFile, errFile, watchDirectory;
+    
     if (params.length > 0) {
         if ((params[0] == '-h' || params[0] == '--help')) {
             return show_usage();
@@ -36,21 +37,47 @@ exports.main = function cmd(params) {
     if (!fs.existsSync(path.resolve(cwd, CFG_FILE_NAME))) {
         return console.error('Cannot find mmconfig.json in current directory. Consider run mm init first.');
     }
-    
+    try {
+        //mmconfig.json could contain RegExp and other non-json object, so we use Function-eval instead JSON.parse
+        config = new Function('return ' + fs.readFileSync(path.resolve(process.cwd(), CFG_FILE_NAME), {encoding: 'utf-8'}))();
+    } catch (e) {
+        return console.error('Fail to parse config file: ' + e);
+    }
     if(config.forever.enable) {
+        pidFile = path.resolve(cwd, config.forever.pidFile || 'forever/app.pid');
+        outFile = path.resolve(cwd, config.forever.outFile || 'forever/out.pid');
+        errFile = path.resolve(cwd, config.forever.errFile || 'forever/err.pid');
+        watchDirectory = path.resolve(cwd, config.forever.watchDirectory || 'server/');
+
+        if (!fs.existsSync(path.resolve(pidFile, '..'))) {
+            return console.error('Parent folder of forever pidFile "' + pidFile + '" does not exist, please create it first.');
+        }
+        if (!fs.existsSync(path.resolve(outFile, '..'))) {
+            return console.error('Parent folder of forever outFile "' + outFile + '" does not exist, please create it first.');
+        }
+        if (!fs.existsSync(path.resolve(errFile, '..'))) {
+            return console.error('Parent folder of forever errFile "' + errFile + '" does not exist, please create it first.');
+        }
+        if (!fs.existsSync(watchDirectory)) {
+            return console.error('Forever watchDirectory does not exist, please check.');
+        }
         cp = new forever(mm_run_file, {
             max: config.forever.max || 3,
             silent: config.forever.silent === true,
-            pidFile: path.resolve(cwd, config.forever.pidFile || 'forever/app.pid'),
-            outFile: path.resolve(config.forever.outFile || 'forever/out.pid'),
-            errFile: path.resolve(config.forever.errFile || 'forever/err.pid'),
+            pidFile: pidFile,
+            outFile: outFile,
+            errFile: errFile,
             watch: config.forever.watch === true,
-            watchDirectory: path.resolve(config.forever.watchDirectory || 'server/'),
+            watchDirectory: watchDirectory,
             options: options
         });
         cp.on('exit', function () {
+            console.log('mm server has exited.');
+            process.exit(1);
+        });
+        cp.on('restart', function() {
             var t = new Date();
-            console.log(mm_run_file + ' has exited from forever.');
+            console.log('Restart mm server ...');
             if (t - last_exit_time < MIN_EXIT_INTERVAL) {
                 exit_count += 1;
                 if (exit_count > MAX_EXIT) {
@@ -61,9 +88,6 @@ exports.main = function cmd(params) {
                 exit_count = 0;
             }
             last_exit_time = t;
-        });
-        cp.on('restart', function() {
-            console.log('Restart ' + mm_run_file + ' ...');
         });
         cp.start();
         last_exit_time = new Date();
