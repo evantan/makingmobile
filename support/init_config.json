@@ -28,6 +28,29 @@
         //"/repository": "build/repository/"
     },
     
+    /*
+     * session 设置
+     */
+    "session": {
+        "enabled": true,
+        /*
+         * 使用的后端存储机制。目前支持mongodb后端及内存后端。生产环境下不建议用内存后端。
+         */
+        "store-name": "mongodb", //or "memory"
+        "options": {
+            "secret": "makingmobile",
+            "key": "connect.sid",
+            "cookie": {
+                "path": '/',
+                "maxAge": 3600 * 24 * 7
+            }
+        },
+        "db-options": {
+            //form: mongodb://user:pass@host:port/database/collection
+            "url": "mongodb://localhost:27017/myapp/session"
+        }
+    },
+    
     /* forever设置 */
     "forever": {
         /* 是否启用 */
@@ -73,7 +96,7 @@
         "zoneID": "MakingMobile Node Backend",
         
         /* 允许接入的zoneid白名单 */
-        "whiteList": /^.*$/, //allow all
+        "whiteList": [/^.*$/], //allow all
         
         /* 禁止接入的zoneid黑名单 */
         "blackList": [] //deny nothing
@@ -103,6 +126,7 @@
     }, ],
     
     "dependencies":{
-        "mongodb": "*"
+        "mongodb": "*",
+        "connect-mongo": "*"
     }
 }

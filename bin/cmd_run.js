@@ -10,7 +10,7 @@ var CFG_FILE_NAME = 'mmconfig.json',
     path = require('path'),
     forever = require('forever-monitor').Monitor,
     cwd = process.cwd(),
-    mm_run_file = path.resolve(cwd, 'node_modules/makingmobile/support/run.js'),
+    mm_run_file = path.resolve(cwd, 'run.js'),
     config, cp;
 
 function show_usage(){

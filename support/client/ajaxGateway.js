@@ -204,6 +204,9 @@
             return;
         }
         if (source === 'recv') {
+            if (self._suspended) {
+                return;
+            }
             this._errCount += 1;
             if (this._errCount > this.config.maxerr) {
                 //Too many errors, wait a little bit
@@ -233,6 +236,9 @@
                 }, {
                     to: ZONE_LOCAL
                 });
+            }
+            if (self._suspended) {
+                return;
             }
             self.sendBuff();
         }
@@ -402,6 +408,25 @@
             this._zoneBidiLinks[dzk].config.defaultZone = false;
         }
         this._zoneBidiLinks[config.url] = new BidiLink(this, config);
+    };
+    
+    /*
+     * Get all remote zones. First zone is default zone.
+     */
+    AjaxGateway.prototype.getRemoteZones = function () {
+        var arr = [],
+            z, defaultZone;
+        for (z in this._zoneBidiLinks) {
+            if (this._zoneBidiLinks.hasOwnProperty(z)) {
+                if (this._zoneBidiLinks[z].config.defaultZone) {
+                    defaultZone = this._zoneBidiLinks[z].remoteZone;
+                } else {
+                    arr.push(this._zoneBidiLinks[z].remoteZone);
+                }
+            }
+        }
+        arr.unshift(defaultZone);
+        return arr;
     };
 
     AjaxGateway.prototype.close = function (zoneORurl) {

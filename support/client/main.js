@@ -6,19 +6,13 @@ var RESERVED_WORDS = [/^_/, /^makingmobile$/i, /^mm$/i, /^core/i],
     AjaxGateway = require('./ajaxGateway'),
     Localstore = require('./localstore');
 
-function slash_url(url) {
-    if (url.length > 0 && url[0] !== '/') {
-        url = '/' + url;
-    }
-    return url[url.length - 1] === '/' ? url.slice(0, url.length - 1) : url;
-}
-
 /*
  * clientSide makingMobile core class
  */
 function MakingMobile(config){
     this.config = config;
     this.hasPhoneGap = document.location.protocol === 'file:' && window.device;
+    this.util = require('./util');
 }
 
 MakingMobile.prototype._envReady = function (plugins) {
@@ -41,7 +35,7 @@ MakingMobile.prototype._envReady = function (plugins) {
     }
     this.go('envReady', null, {to: '.'});
     if (this.config.autopen) {
-        surl = (this.config.url[this.config.url.length -1] === '/' ? this.config.url.slice(0, this.config.url.length -1) : this.config.url) + slash_url(this.config.urlprefix || '');
+        surl = this.config.url.replace(/\/$/, '') + this.util.slash_url(this.config.urlprefix || '');
         this.gateway.open(surl + SERVER_GATEWAY_URLSPACE);
         if (this.hasPhoneGap && navigator.connection.type === Connection.NONE) {
             this.gateway.pause();
