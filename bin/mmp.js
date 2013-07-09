@@ -47,7 +47,7 @@ function main(argv) {
     } else {
         cmd = argv[0];
         if (plugin_cmd.hasOwnProperty(cmd)){
-            argv[cmd](argv.slice(1), config, config_root);
+            plugin_cmd[cmd](argv.slice(1), config, config_root);
         } else {
             console.error('Cannot find plugin: ' + cmd);
         }

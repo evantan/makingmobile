@@ -183,10 +183,17 @@
         }
     };
 
+    
+    //XMLHttpRequest level 1 supports, for android 2.x
+    //We just use the same function, because 'withCredentials' actually not in use.
+    var Xhr = Xhr2;
+    
     if (window.XMLHttpRequest && 'withCredentials' in new window.XMLHttpRequest()) {
         module.exports = Xhr2;
     } else if (window.XDomainRequest) {
         module.exports = Xdr;
+    } else if (window.XMLHttpRequest) {
+        module.exports = Xhr;
     } else {
         throw "browser support neither XMLHttpRequest2 nor XDomainRequest";
     }
