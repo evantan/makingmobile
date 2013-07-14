@@ -2,7 +2,7 @@
 var RESERVED_WORDS = [/^_/, /^makingmobile$/i, /^mm$/i, /^core/i],
     CFG_GATEWAY = 'gateway',
     SERVER_GATEWAY_URLSPACE = '/gateway',
-    Ajax = require('./ajax'),
+    Ajaxlib = require('./ajax'),
     AjaxGateway = require('./ajaxGateway'),
     Localstore = require('./localstore');
 
@@ -10,28 +10,29 @@ var RESERVED_WORDS = [/^_/, /^makingmobile$/i, /^mm$/i, /^core/i],
  * clientSide makingMobile core class
  */
 function MakingMobile(config){
+    var zoneID = null;
+    
     this.config = config;
-    this.hasPhoneGap = document.location.protocol === 'file:' && window.device;
+    this.hasPhoneGap = window.cordova !== undefined;
     this.util = require('./util');
+    this.localstore = Localstore();
+    zoneID = this.localstore.get('zoneID');
+    this.gateway = new AjaxGateway(zoneID);
+    this.Ajax = Ajaxlib;
+    //so, default nameSpace is 'mm'
+    this.gateway.delegate(this, 'mm');
+    this.pluginManager = {};
 }
 
-MakingMobile.prototype._envReady = function (plugins) {
+MakingMobile.prototype._envReady = function () {
     var zoneID = null,
-        i, surl;
+        surl;
     
-    this.localstore = Localstore();
     zoneID = this.localstore.get('zoneID');
     if (!zoneID && this.hasPhoneGap) {
         zoneID = device.uuid;
         this.localstore.set('zoneID', zoneID);
-    }
-    this.gateway = new AjaxGateway(zoneID);
-    this.Ajax = Ajax;
-    //so, default nameSpace is 'mm'
-    this.gateway.delegate(this, 'mm');
-    this.pluginManager = {};
-    for (i = 0; i < plugins.length; i++) {
-        plugins[i]['p']._init(this, plugins[i]['config']);
+        this.gateway._zoneID = zoneID;
     }
     this.go('envReady', null, {to: '.'});
     if (this.config.autopen) {
@@ -44,11 +45,15 @@ MakingMobile.prototype._envReady = function (plugins) {
 };
 
 MakingMobile.prototype._init = function(plugins) {
-    var self = this;
+    var self = this,
+        i;
     
+    for (i = 0; i < plugins.length; i++) {
+        plugins[i]['p']._init(this, plugins[i]['config']);
+    }
     if(this.hasPhoneGap) {
         document.addEventListener("deviceready", function() {
-            self._envReady(plugins);
+            self._envReady();
         }, false);
         document.addEventListener("online", function() {
             self.gateway.resume();
@@ -57,7 +62,7 @@ MakingMobile.prototype._init = function(plugins) {
             self.gateway.pause();
         }, false);
     } else {
-        self._envReady(plugins);
+        self._envReady();
     }
 };
 
@@ -79,5 +84,30 @@ MakingMobile.prototype.register = function (plugin, mmPropName) {
     }
     this[mmPropName] = this.pluginManager[mmPropName] = plugin;
 };
+
+/*
+ * bind patch -- we just need it
+ */
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function (oThis) {
+        if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5 internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+        }
+
+        var aArgs = Array.prototype.slice.call(arguments, 1), 
+            fToBind = this, 
+            fNOP = function () {},
+            fBound = function () {
+                return fToBind.apply(this instanceof fNOP && oThis ? this : oThis || window,
+                        aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
+
+        fNOP.prototype = this.prototype;
+        fBound.prototype = new fNOP();
+
+        return fBound;
+    };
+}
 
 module.exports = MakingMobile;

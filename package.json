@@ -1,6 +1,6 @@
 {
   "name": "makingmobile",
-  "version": "0.0.2-beta.6",
+  "version": "0.0.2-beta.7",
   "description": "MakingMobile framework",
   "main": "lib/makingmobile.js",
   "bin": {
@@ -10,7 +10,7 @@
   "dependencies": {
     "express": ">3.0.0",
     "forever-monitor": "*",
-    "node-minify": "*",
+    "node-minify": "=0.7.3",
     "npm": "*"
   },
   "devDependencies": {

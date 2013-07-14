@@ -118,12 +118,87 @@
     "plugins": [{
         "name": "log",
         "version": "*",
-        "urlspace": "/log",
+        "urlspace": "log",
         "file": "var/log.txt",
         "db": "mongodb://localhost:27017/myapp",
         "collection": "log",
         "client_buff_max": 100
-    }, ],
+    }, {
+        "name": "autoupdater",
+        "version": "*",
+        "urlspace": "autoupdater",
+        /*
+         *  客户端的更新文件存储位置，相对于sd卡根目录
+         */
+        "client-repository-path": "myapp",
+        "source": [{
+            /* 相对于mmconfig.json */
+            "from": "client/",
+            /* 形如"a/folder/name"。相对于destination的path */
+            "to": "",
+            /*
+             * 每项可为正则表达式或文件路径名字串。相对于当前source。
+             */
+            "ignore": [],
+            /*
+             * 每项形如: （相对于当前source）
+             * {
+             *     "path/to/built.bundle": ["path/to/source/file", ]
+             * }
+             * 注意如果值为字串，则该字串应为一个html文件名，此html文件的head部分含有如下部分：
+             *   <!-- bundle js:path/to/built.bundle -->
+             *   <script type="text/javascript" src="some/js/file"></script>
+             *   <script type="text/javascript" src="some/js/file"></script>
+             *    ...
+             *   <!-- bundle end -->
+             *   
+             *   或者：
+             *   <!-- bundle css:path/to/built.bundle -->
+             *   <link rel="stylesheet" href="some/css/file"/>
+             *   <link rel="stylesheet" href="some/css/file"/>
+             *    ...
+             *   <!-- bundle end -->
+             *    
+             */
+            "bundle": {},
+            /* 每项形如： （相对于当前source）
+             * {
+             *    "from/path/old.file": "to/path/new.file"
+             * }*/
+            "rename": {},
+        }],
+        "destination": [{
+            /*
+             * 生成的路径名
+             */
+            "path": "build/www",
+            /*
+             * 生成此目录内容之前是否先清空本目录
+             */
+            "cleanBeforeBuild": true,
+            /*
+             * 是否将js文件压缩
+             */
+            "minify-js": true,
+            /*
+             * 是否将css文件压缩
+             */
+            "minify-css": true,
+            /*
+             * 需要忽略压缩的js及css文件名，相对于当前path。
+             */
+            "minify-ignore": [],
+            /*
+             * 如为非空字符串，则会在该destination根目录下生成以此为文件名的更新元文件，并且
+             * 客户端autoupdater将同步到此destination。
+             */
+            "repository-meta-filename": ".repmeta",
+            /*
+             * 每项为"source"配置中的"from"
+             */
+            "skip-source": []
+        }, ]
+    }],
     
     "dependencies":{
         "mongodb": "*",

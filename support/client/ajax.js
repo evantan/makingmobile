@@ -4,7 +4,7 @@
     "use strict";
 
     /*
-     * Ajax interface has two method:
+     * Ajax interface has four methods:
      *    1. send(url, bodyString, timeout, success, error)
      *  
      *          success:    funuction(responseText)
@@ -13,11 +13,13 @@
      *                  code 1 -- Server return non-200 status code(contained in info)
      *                  code 2 -- timeout
      *                  code 3 -- other error
-     *    2. abort()
+     *    2. get(url, bodyString, timeout, success, error) same params as send
      *    
-     *    2. isCompleted() 
+     *    3. abort()
      *    
-     * send() is serial, call another send before preceding one complete lead to error.
+     *    4. isCompleted() 
+     *    
+     * send() and get() is serial, call another before preceding one complete lead to error.
      */
 
     function Xhr2() {
@@ -57,6 +59,34 @@
             //Try not to send a preflight
             xhr.setRequestHeader('Content-Type', 'text/plain');
             xhr.send(bodyString);
+        } catch (e) {
+            self._error(3, e);
+        }
+        return self;
+    };
+    
+    Xhr2.prototype.get = function (url, timeout, success, error) {
+        var self = this,
+            xhr = new window.XMLHttpRequest();
+        
+        if (self._xhr !== null) {
+            return self._error(3, 'Preceding send() uncompleted');
+        }
+        self._xhr = xhr;
+        self._success = success;
+        self._error = error;
+        //XDomainRequest does not support withCredentials, and we don't need cookie
+        //xhr.withCredentials = false;
+        self._timer = window.setTimeout(function () {
+            self._cleanup(true);
+        }, timeout);
+        xhr.onreadystatechange = function () {
+            self._onreadystatechange();
+        };
+        try {
+            xhr.open('GET', url, true);
+            //Try not to send a preflight
+            xhr.setRequestHeader('Content-Type', 'text/plain');
         } catch (e) {
             self._error(3, e);
         }
@@ -141,6 +171,35 @@
         try {
             xdr.open('POST', url);
             xdr.send(bodyString);
+        } catch (e) {
+            self._error(3, e);
+        }
+        return self;
+    };
+    
+    Xdr.prototype.get = function (url, timeout, success, error) {
+        var self = this,
+            xdr = new window.XDomainRequest();
+        
+        if (self._xdr !== null) {
+            return self._error(3, 'Preceding send() uncompleted');
+        }
+        self._xdr = xdr;
+        self._success = success;
+        self._error = error;
+        xdr.timeout = timeout;
+        xdr.contentType = "text/plain";
+        xdr.onerror = function () {
+            self._onerror();
+        };
+        xdr.onload = function () {
+            self._onload();
+        };
+        xdr.ontimeout = function () {
+            self._ontimeout();
+        };
+        try {
+            xdr.open('GET', url);
         } catch (e) {
             self._error(3, e);
         }

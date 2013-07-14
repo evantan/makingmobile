@@ -1,5 +1,6 @@
 /*jslint sub:true, evil:true */
-var CFG_FILE_NAME = 'mmconfig.json',
+var EXTRA_DEPENDENCIES = {},
+    CFG_FILE_NAME = 'mmconfig.json',
     PLUGIN_PREFIX = 'makingmobile-plugin-',
     USAGES = ['Build plugins in config, generate client-side files and do other stuff. For details, see docs'],
     fs = require('fs'),
@@ -51,6 +52,11 @@ function write_package_json(){
             pjconfig.dependencies[p] = config.dependencies[p];
         }
     }
+    for (p in EXTRA_DEPENDENCIES) {
+        if (EXTRA_DEPENDENCIES.hasOwnProperty(p)) {
+            pjconfig.dependencies[p] = EXTRA_DEPENDENCIES[p];
+        }
+    }
     fs.writeFileSync('package.json', JSON.stringify(pjconfig), {encoding: 'utf8'});
 }
 
@@ -92,7 +98,24 @@ function make_entry_file() {
                   '\n',
         i;
     
-    config.client['instance-config'].urlprefix = config.urlprefix || '';
+    if (!config.client['instance-config'].hasOwnProperty('name')){
+        config.client['instance-config'].name = config.name;
+    }
+    if (!config.client['instance-config'].hasOwnProperty('version')){
+        config.client['instance-config'].version = config.version;
+    }
+    if (!config.client['instance-config'].hasOwnProperty('description')){
+        config.client['instance-config'].description = config.description;
+    }
+    if (!config.client['instance-config'].hasOwnProperty('debug')){
+        config.client['instance-config'].debug = config.debug;
+    }
+    if (!config.client['instance-config'].hasOwnProperty('port')){
+        config.client['instance-config'].port = config.port;
+    }
+    if (!config.client['instance-config'].hasOwnProperty('urlprefix')){
+        config.client['instance-config'].urlprefix = config.urlprefix;
+    }
     
     for (i = 0; i < config.plugins.length; i++) {
         content += 'plugin_config = ' + JSON.stringify(config.plugins[i]);
