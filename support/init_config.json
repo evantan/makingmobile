@@ -127,10 +127,6 @@
         "name": "autoupdater",
         "version": "*",
         "urlspace": "autoupdater",
-        /*
-         *  客户端的更新文件存储位置，相对于sd卡根目录
-         */
-        "client-repository-path": "myapp",
         "source": [{
             /* 相对于mmconfig.json */
             "from": "client/",
@@ -198,6 +194,19 @@
              */
             "skip-source": []
         }, ]
+    }, {
+        "name": "doc",
+        "version": "*",
+        "urlspace": "doc",
+        "docfolder": "var/doc/",
+        "msoffice2pdf": true,
+        "libreoffice2pdf": true,
+        "maxFileSize": 1024*1024*6,
+        "pdfConvertTimeout": 60*5,
+        "imageConvertTimeout": 60*3,
+        "imageDensity": 96,
+        "targetImageType": 'png',
+        "allowedIpaddress": [/.*/]
     }],
     
     "dependencies":{

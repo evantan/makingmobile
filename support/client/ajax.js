@@ -41,7 +41,7 @@
             xhr = new window.XMLHttpRequest();
         
         if (self._xhr !== null) {
-            return self._error(3, 'Preceding send() uncompleted');
+            return error(3, 'Preceding send() uncompleted');
         }
         self._xhr = xhr;
         self._success = success;
@@ -70,7 +70,7 @@
             xhr = new window.XMLHttpRequest();
         
         if (self._xhr !== null) {
-            return self._error(3, 'Preceding send() uncompleted');
+            return error(3, 'Preceding send() uncompleted');
         }
         self._xhr = xhr;
         self._success = success;
@@ -85,8 +85,7 @@
         };
         try {
             xhr.open('GET', url, true);
-            //Try not to send a preflight
-            xhr.setRequestHeader('Content-Type', 'text/plain');
+            xhr.send(null);
         } catch (e) {
             self._error(3, e);
         }
@@ -152,7 +151,7 @@
             xdr = new window.XDomainRequest();
         
         if (self._xdr !== null) {
-            return self._error(3, 'Preceding send() uncompleted');
+            return error(3, 'Preceding send() uncompleted');
         }
         self._xdr = xdr;
         self._success = success;
@@ -182,13 +181,12 @@
             xdr = new window.XDomainRequest();
         
         if (self._xdr !== null) {
-            return self._error(3, 'Preceding send() uncompleted');
+            return error(3, 'Preceding send() uncompleted');
         }
         self._xdr = xdr;
         self._success = success;
         self._error = error;
         xdr.timeout = timeout;
-        xdr.contentType = "text/plain";
         xdr.onerror = function () {
             self._onerror();
         };
@@ -200,6 +198,7 @@
         };
         try {
             xdr.open('GET', url);
+            xdr.send();
         } catch (e) {
             self._error(3, e);
         }
