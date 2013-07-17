@@ -60,13 +60,13 @@
         "silent": false,
         
         /* pid文件的位置 */
-        "pidFile": "forever/app.pid",
+        "pidFile": "var/forever/app.pid",
         
         /* stdout文件位置 */
-        "outFile": "forever/out.log",
+        "outFile": "var/forever/out.log",
         
         /* stderr文件位置 */
-        "errFile": "forever/err.log",
+        "errFile": "var/forever/err.log",
         
         /* 运行的最大次数 */
         "max": Number.MAX_VALUE,
