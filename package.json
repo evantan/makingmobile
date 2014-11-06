@@ -8,10 +8,10 @@
     "mmp": "bin/mmp.js"
   },
   "dependencies": {
-    "express": ">3.0.0",
-    "forever-monitor": "*",
+    "express": "=3.0.0",
+    "forever-monitor": "=1.2.2",
     "node-minify": "=0.7.3",
-    "npm": "*"
+    "npm": "=1.3.4"
   },
   "devDependencies": {
     "browserify": ">2.18.0"
