@@ -3,7 +3,7 @@
     "name": 'MyApp',
     
     /* 应用的版本号，应符合"Semantic Versioning"规则 */
-    "version": "0.1.0",
+    "version": "1.0.0",
     
     /* 应用描述 */
     "description": "我的应用",
@@ -39,7 +39,7 @@
         "store-name": "mongodb", //or "memory"
         "options": {
             "secret": "makingmobile",
-            "key": "connect.sid",
+            "name": "connect.sid",
             "cookie": {
                 "path": '/',
                 "maxAge": 3600 * 24 * 7

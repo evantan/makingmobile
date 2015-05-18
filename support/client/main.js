@@ -1,5 +1,5 @@
 /*jslint sub:true */
-var RESERVED_WORDS = [/^_/, /^makingmobile$/i, /^mm$/i, /^core/i],
+var RESERVED_WORDS = [/^_/, /^MakingMobile$/i, /^makingmobile$/i, /^mm$/i, /^core/i],
     CFG_GATEWAY = 'gateway',
     SERVER_GATEWAY_URLSPACE = '/gateway',
     Ajaxlib = require('./ajax'),
@@ -86,7 +86,7 @@ MakingMobile.prototype.register = function (plugin, mmPropName) {
 };
 
 /*
- * bind patch -- we just need it
+ * binding patch -- we just need it
  */
 if (!Function.prototype.bind) {
     Function.prototype.bind = function (oThis) {

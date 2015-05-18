@@ -69,7 +69,7 @@ exports.main = function cmd(params) {
             errFile: errFile,
             watch: config.forever.watch === true,
             watchDirectory: watchDirectory,
-            options: options
+            args: options
         });
         cp.on('exit', function () {
             console.log('mm server has exited.');
@@ -82,7 +82,7 @@ exports.main = function cmd(params) {
                 exit_count += 1;
                 if (exit_count > MAX_EXIT) {
                     cp.stop();
-                    console.log("Exit too many times during a short interval, stop auto-respawning, pls check error.");
+                    console.log("Exit too many times during a short interval, stop auto-respawning, pleases check error.");
                 }
             } else {
                 exit_count = 0;
