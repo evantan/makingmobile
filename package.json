@@ -1,6 +1,6 @@
 {
   "name": "makingmobile",
-  "version": "2.2.1-beta.1",
+  "version": "2.2.1-beta.2",
   "description": "MakingMobile framework",
   "main": "lib/makingmobile.js",
   "bin": {
