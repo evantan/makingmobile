@@ -165,11 +165,10 @@ function generate_client_files() {
     make_entry_file();
     b = browserify({
         entries: noParse.concat(TEMP_ENTRY_FILE),
-        noParse: noParse
-    });
-    b.bundle({
+        noParse: noParse,
         debug: config.client.debug
-    }, function(err, src) {
+    });
+    b.bundle(function(err, src) {
         var i, post_build;
         
         if (err) {
