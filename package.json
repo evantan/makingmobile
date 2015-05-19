@@ -1,6 +1,6 @@
 {
   "name": "makingmobile",
-  "version": "2.2.1",
+  "version": "2.2.1-beta.1",
   "description": "MakingMobile framework",
   "main": "lib/makingmobile.js",
   "bin": {
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/makingmobile/makingmobile.git"
+    "url": "https://github.com/evantan/makingmobile.git"
   },
   "keywords": [
     "makingmobile",
