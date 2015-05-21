@@ -13,7 +13,7 @@ function MakingMobile(config){
     var zoneID = null;
     
     this.config = config;
-    this.hasPhoneGap = window.cordova !== undefined;
+    this.hasCordova = window.cordova !== undefined;
     this.util = require('./util');
     this.localstore = Localstore();
     zoneID = this.localstore.get('zoneID');
@@ -29,7 +29,7 @@ MakingMobile.prototype._envReady = function () {
         surl;
     
     zoneID = this.localstore.get('zoneID');
-    if (!zoneID && this.hasPhoneGap) {
+    if (!zoneID && this.hasCordova) {
         zoneID = device.uuid;
         this.localstore.set('zoneID', zoneID);
         this.gateway._zoneID = zoneID;
@@ -38,7 +38,7 @@ MakingMobile.prototype._envReady = function () {
     if (this.config.autopen) {
         surl = this.config.url.replace(/\/$/, '') + this.util.slash_url(this.config.urlprefix || '');
         this.gateway.open(surl + SERVER_GATEWAY_URLSPACE);
-        if (this.hasPhoneGap && navigator.connection.type === Connection.NONE) {
+        if (this.hasCordova && navigator.connection.type === Connection.NONE) {
             this.gateway.pause();
         }
     }
@@ -51,7 +51,7 @@ MakingMobile.prototype._init = function(plugins) {
     for (i = 0; i < plugins.length; i++) {
         plugins[i]['p']._init(this, plugins[i]['config']);
     }
-    if(this.hasPhoneGap) {
+    if(this.hasCordova) {
         document.addEventListener("deviceready", function() {
             self._envReady();
         }, false);
